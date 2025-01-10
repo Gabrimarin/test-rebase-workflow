@@ -9,8 +9,12 @@ on:
 
 jobs:
   rebase-release:
+
     if: ${{ github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'patch/') }}
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
