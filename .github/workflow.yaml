@@ -1,0 +1,45 @@
+name: Rebase Latest Release with Main After Patch Merge
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  rebase-release:
+    if: ${{ github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'patch/') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Fetch all branches
+        run: git fetch --all --prune
+
+      - name: Find latest release branch
+        id: find-release
+        run: |
+          RELEASE_BRANCH=$(git branch -r | grep -o "origin/release/[0-9]*\.[0-9]*\.[0-9]*" | sort -V | tail -n 1 | sed 's|origin/||')
+          echo "Latest release branch: $RELEASE_BRANCH"
+          echo "release_branch=$RELEASE_BRANCH" >> $GITHUB_ENV
+      - name: Rebase release branch onto main
+        run: |
+          git checkout ${{ env.release_branch }}
+          git rebase origin/main
+      - name: Push rebased release branch
+        run: |
+          git push origin ${{ env.release_branch }} --force-with-lease
+      - name: Notify Rebase Success
+        if: success()
+        run: echo "Successfully rebased ${{ env.release_branch }} onto main."
+
+      - name: Notify Rebase Failure
+        if: failure()
+        run: echo "Rebase failed. Manual intervention required for branch ${{ env.release_branch }}."
