@@ -68,14 +68,16 @@ jobs:
         run: |
           echo "Processing mapping from env variable..."
           mapping="${PATH_CONFIG_MAPPING}"
-          echo "$mapping"
+          # print content of mapping
+          echo "PRINTING MAPPING"
+          echo $mapping
+
 
           # Prepare filters dynamically
           filters=""
           for path in $(echo $mapping | jq -r '.[] | .path'); do
             filters="$filters\n$path: $path/**"
           done
-          echo "$filters"
           echo "filters=$(echo $filters)" >> $GITHUB_OUTPUT
 
       - name: Paths Filter
