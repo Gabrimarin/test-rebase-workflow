@@ -75,9 +75,14 @@ jobs:
 
           # Prepare filters dynamically
           filters=""
-          for path in $(echo $mapping | jq -r '.[] | .path'); do
-            filters="$filters\n$path: $path/**"
+          for row in $(echo "$mapping" | jq -r '.[] | @base64'); do
+            _jq() {
+              echo ${row} | base64 --decode | jq -r ${1}
+            }
+            path=$(_jq '.path')
+            filters="$filters$path\n"
           done
+
           echo "filters=$filters" >> $GITHUB_ENV
 
       - name: Paths Filter
