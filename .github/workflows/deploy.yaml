@@ -73,8 +73,9 @@ jobs:
           echo $mapping
 
 
-          # Prepare filters dynamically
-          filters=$(echo "$mapping" | jq -r '.[].path' | jq -nR '[inputs] | join(",")')
+          # Prepare filters dynamically ("$path:$path/**" for each path)
+          filters=$(echo "$mapping" | jq -r '.[] | "\(.path):\(.path)/**"')
+
 
           echo "filters=$filters" >> $GITHUB_ENV
 
