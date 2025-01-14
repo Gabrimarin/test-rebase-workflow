@@ -74,7 +74,8 @@ jobs:
 
 
           # Prepare filters dynamically ("$path:$path/**" for each path)
-          filters=$(echo "$mapping" | jq -r '.[] | "\(.path):\(.path)/**"')
+          echo "$mapping" | jq -r '.[] | "\(.path):\(.path)/**"' > filters.txt
+          filters=$(cat filters.txt)
 
           echo $filters
 
