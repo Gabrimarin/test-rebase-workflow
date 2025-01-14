@@ -75,7 +75,7 @@ jobs:
             filters="$filters\n$path: $path/**"
           done
 
-          echo "filters=$(echo $filters) >> $GITHUB_OUTPUT"
+          echo "filters=$(echo $filters)" >> $GITHUB_OUTPUT
 
       - name: Paths Filter
         id: filter
@@ -95,7 +95,7 @@ jobs:
             map(select(.path as $p | $changed | index($p) != null))
           ')
 
-          echo "filtered_objects=$(echo $filtered) >> $GITHUB_OUTPUT"
+          echo "filtered_objects=$(echo $filtered)" >> $GITHUB_OUTPUT
 
   build:
     needs: changes
