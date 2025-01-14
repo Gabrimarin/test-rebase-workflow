@@ -19,8 +19,86 @@ env:
   GOOGLE_SERVICE_ACCOUNT: "${{ secrets.PRE_PRODUCTION_SERVICE_ACCOUNT }}"
   GOOGLE_APPLICATION_CREDENTIALS: "${{ secrets.PRE_PRODUCTION_SERVICE_ACCOUNT }}"
 
+  PATH_CONFIG_MAP: |
+    [
+          { path: "typesense-client", config: "firebase-typesense.json" },
+          { path: "kiosk", config: "firebase-kiosk.json" },
+          { path: "tickets", config: "firebase-tickets.json" },
+          { path: "tickets-new", config: "firebase-tickets_new.json" },
+          { path: "push-notis", config: "firebase-notis.json" },
+          { path: "userprofiles", config: "firebase-userprofiles.json" },
+          { path: "fb", config: "firebase-fb.json" },
+          { path: "payments", config: "firebase-payments.json" },
+          { path: "payments-new", config: "firebase-payments-new.json" },
+          { path: "wallets", config: "firebase-wallets.json" },
+          { path: "user", config: "firebase-user.json" },
+          { path: "stripe-client", config: "firebase-stripe.json" },
+          { path: "slack-new", config: "firebase-slack_new.json" },
+          { path: "greendot", config: "firebase-greendot.json" },
+          { path: "kiosk-backend", config: "firebase-kiosk_backend.json" },
+          { path: "receipts", config: "firebase-receipts.json" },
+          { path: "hosts", config: "firebase-hosts.json" },
+          { path: "leases", config: "firebase-leases.json" },
+          { path: "locations", config: "firebase-locations.json" },
+          { path: "transactions", config: "firebase-transactions.json" },
+          { path: "machines", config: "firebase-machines.json" },
+          { path: "simplex", config: "firebase-simplex.json" },
+          { path: "buy-online", config: "firebase-buy-online.json" },
+          { path: "plaid", config: "firebase-plaid.json" },
+          { path: "change-logs", config: "firebase-change-logs.json" },
+          { path: "promo-ts", config: "firebase-promo.json" },
+          { path: "hexnode", config: "firebase-hexnode.json" },
+          { path: "reports", config: "firebase-reports.json" },
+          { path: "query", config: "firebase-query.json" }
+    ]
+
 jobs:
+  changes:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: read
+    outputs:
+      paths: ${{ steps.filter.outputs.changes }}
+    steps:
+      - name: "Initialize Mapping"
+        id: process-mapping
+        run: |
+          echo "Processing mapping from env variable..."
+          mapping="${PATH_CONFIG_MAPPING}"
+
+          # Prepare filters dynamically
+          filters=""
+          for path in $(echo $mapping | jq -r '.[] | .path'); do
+            filters="$filters\n$path: $path/**"
+          done
+
+          echo "::set-output name=filters::$(echo -e "$filters")"
+
+      - name: Paths Filter
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: ${{ steps.process-mapping.outputs.filters }}
+
+      - name: Filter Changed Objects
+        id: get-changed-objects
+        run: |
+          echo "Filtering changed paths..."
+          mapping="${{ env.PATH_CONFIG_MAP }}"
+          changed="${{ steps.filter.outputs.changes }}"
+
+          # Generate the filtered list of path-config pairs
+          filtered=$(echo "$mapping" | jq -c --argjson changed "[$changed]" '
+            map(select(.path as $p | $changed | index($p) != null))
+          ')
+
+          echo "::set-output name=filtered_objects::$filtered"
+
   build:
+    needs: changes
     runs-on: ubuntu-latest
     name: Build Changes in Pre-Prod
     if: ${{ !github.event.pull_request.draft }}
@@ -33,36 +111,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        component:
-          - { path: "typesense-client", config: "firebase-typesense.json" }
-          - { path: "kiosk", config: "firebase-kiosk.json" }
-          - { path: "tickets", config: "firebase-tickets.json" }
-          - { path: "tickets-new", config: "firebase-tickets_new.json" }
-          - { path: "push-notis", config: "firebase-notis.json" }
-          # - { path: "userprofiles", config: "firebase-userprofiles.json" }
-          # - { path: "fb", config: "firebase-fb.json" }
-          # - { path: "payments", config: "firebase-payments.json" }
-          # - { path: "payments-new", config: "firebase-payments-new.json" }
-          # - { path: "wallets", config: "firebase-wallets.json" }
-          # - { path: "user", config: "firebase-user.json" }
-          # - { path: "stripe-client", config: "firebase-stripe.json" }
-          # - { path: "slack-new", config: "firebase-slack_new.json" }
-          # - { path: "greendot", config: "firebase-greendot.json" }
-          # - { path: "kiosk-backend", config: "firebase-kiosk_backend.json" }
-          # - { path: "receipts", config: "firebase-receipts.json" }
-          # - { path: "hosts", config: "firebase-hosts.json" }
-          # - { path: "leases", config: "firebase-leases.json" }
-          # - { path: "locations", config: "firebase-locations.json" }
-          # - { path: "transactions", config: "firebase-transactions.json" }
-          # - { path: "machines", config: "firebase-machines.json" }
-          # - { path: "simplex", config: "firebase-simplex.json" }
-          # - { path: "buy-online", config: "firebase-buy-online.json" }
-          # - { path: "plaid", config: "firebase-plaid.json" }
-          # - { path: "change-logs", config: "firebase-change-logs.json" }
-          # - { path: "promo-ts", config: "firebase-promo.json" }
-          # - { path: "hexnode", config: "firebase-hexnode.json" }
-          # - { path: "reports", config: "firebase-reports.json" }
-          # - { path: "query", config: "firebase-query.json" }
+        component: ${{ fromJson(needs.changes.outputs.filtered_objects) }}
 
     steps:
       - name: git-checkout
@@ -88,23 +137,13 @@ jobs:
       #     sudo npm install -g firebase-tools
       #     firebase use ${{ env.GCP_PROJECT_ID }}
 
-      - name: "Path Filter Check"
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            ${{ matrix.component.path }}:
-              - '${{ matrix.component.path }}/**'
-
-      - if: steps.filter.outputs.${{ matrix.component.path }} == 'true'
-        name: Build and Deploy ${{ matrix.component.path }}
+      - name: Build and Deploy ${{ matrix.component.path }}
         run: |
-          echo "${{steps.filter.outputs}}: Building..."
           echo "Changes detected in /${{ matrix.component.path }}"
+          echo "Config file: ${{ matrix.component.config }}"
         continue-on-error: true
 
-      - if: steps.filter.outputs.${{ matrix.component.path }} == 'true'
-        name: Deploy ${{ matrix.component.path }} after failed tsc
+      - name: Deploy ${{ matrix.component.path }} after failed tsc
         run: |
           cd ${{ matrix.component.path }}
           echo "Deploying ${{ matrix.component.path }} to Pre-Prod"
