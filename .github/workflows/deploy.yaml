@@ -99,6 +99,7 @@ jobs:
       - if: steps.filter.outputs.${{ matrix.component.path }} == 'true'
         name: Build and Deploy ${{ matrix.component.path }}
         run: |
+          echo "${{steps.filter.outputs}}: Building..."
           echo "Changes detected in /${{ matrix.component.path }}"
         continue-on-error: true
 
