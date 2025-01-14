@@ -67,7 +67,7 @@ jobs:
         id: process-mapping
         run: |
           echo "Processing mapping from env variable..."
-          mapping="${{ env.PATH_CONFIG_MAP }}"
+          mapping=${{ env.PATH_CONFIG_MAP }}
           # print content of mapping
           echo "PRINTING MAPPING"
           echo $mapping
