@@ -21,35 +21,35 @@ env:
 
   PATH_CONFIG_MAP: |
     [
-          { "path": "typesense-client", "config": "firebase-typesense.json" },
-          { "path": "kiosk", "config": "firebase-kiosk.json" },
-          { "path": "tickets", "config": "firebase-tickets.json" },
-          { "path": "tickets-new", "config": "firebase-tickets_new.json" },
-          { "path": "push-notis", "config": "firebase-notis.json" },
-          { "path": "userprofiles", "config": "firebase-userprofiles.json" },
-          { "path": "fb", "config": "firebase-fb.json" },
-          { "path": "payments", "config": "firebase-payments.json" },
-          { "path": "payments-new", "config": "firebase-payments-new.json" },
-          { "path": "wallets", "config": "firebase-wallets.json" },
-          { "path": "user", "config": "firebase-user.json" },
-          { "path": "stripe-client", "config": "firebase-stripe.json" },
-          { "path": "slack-new", "config": "firebase-slack_new.json" },
-          { "path": "greendot", "config": "firebase-greendot.json" },
-          { "path": "kiosk-backend", "config": "firebase-kiosk_backend.json" },
-          { "path": "receipts", "config": "firebase-receipts.json" },
-          { "path": "hosts", "config": "firebase-hosts.json" },
-          { "path": "leases", "config": "firebase-leases.json" },
-          { "path": "locations", "config": "firebase-locations.json" },
-          { "path": "transactions", "config": "firebase-transactions.json" },
-          { "path": "machines", "config": "firebase-machines.json" },
-          { "path": "simplex", "config": "firebase-simplex.json" },
-          { "path": "buy-online", "config": "firebase-buy-online.json" },
-          { "path": "plaid", "config": "firebase-plaid.json" },
-          { "path": "change-logs", "config": "firebase-change-logs.json" },
-          { "path": "promo-ts", "config": "firebase-promo.json" },
-          { "path": "hexnode", "config": "firebase-hexnode.json" },
-          { "path": "reports", "config": "firebase-reports.json" },
-          { "path": "query", "config": "firebase-query.json" }
+          { \"path\": \"typesense-client\", \"config\": \"firebase-typesense.json\" },
+          { \"path\": \"kiosk\", \"config\": \"firebase-kiosk.json\" },
+          { \"path\": \"tickets\", \"config\": \"firebase-tickets.json\" },
+          { \"path\": \"tickets-new\", \"config\": \"firebase-tickets_new.json\" },
+          { \"path\": \"push-notis\", \"config\": \"firebase-notis.json\" },
+          { \"path\": \"userprofiles\", \"config\": \"firebase-userprofiles.json\" },
+          { \"path\": \"fb\", \"config\": \"firebase-fb.json\" },
+          { \"path\": \"payments\", \"config\": \"firebase-payments.json\" },
+          { \"path\": \"payments-new\", \"config\": \"firebase-payments-new.json\" },
+          { \"path\": \"wallets\", \"config\": \"firebase-wallets.json\" },
+          { \"path\": \"user\", \"config\": \"firebase-user.json\" },
+          { \"path\": \"stripe-client\", \"config\": \"firebase-stripe.json\" },
+          { \"path\": \"slack-new\", \"config\": \"firebase-slack_new.json\" },
+          { \"path\": \"greendot\", \"config\": \"firebase-greendot.json\" },
+          { \"path\": \"kiosk-backend\", \"config\": \"firebase-kiosk_backend.json\" },
+          { \"path\": \"receipts\", \"config\": \"firebase-receipts.json\" },
+          { \"path\": \"hosts\", \"config\": \"firebase-hosts.json\" },
+          { \"path\": \"leases\", \"config\": \"firebase-leases.json\" },
+          { \"path\": \"locations\", \"config\": \"firebase-locations.json\" },
+          { \"path\": \"transactions\", \"config\": \"firebase-transactions.json\" },
+          { \"path\": \"machines\", \"config\": \"firebase-machines.json\" },
+          { \"path\": \"simplex\", \"config\": \"firebase-simplex.json\" },
+          { \"path\": \"buy-online\", \"config\": \"firebase-buy-online.json\" },
+          { \"path\": \"plaid\", \"config\": \"firebase-plaid.json\" },
+          { \"path\": \"change-logs\", \"config\": \"firebase-change-logs.json\" },
+          { \"path\": \"promo-ts\", \"config\": \"firebase-promo.json\" },
+          { \"path\": \"hexnode\", \"config\": \"firebase-hexnode.json\" },
+          { \"path\": \"reports\", \"config\": \"firebase-reports.json\" },
+          { \"path\": \"query\", \"config\": \"firebase-query.json\" }
     ]
 
 jobs:
@@ -70,6 +70,7 @@ jobs:
           echo "Processing mapping from env variable..."
           # get a list of paths from the env in the format (path1:path1/** /n path2:path2/** /n ...)
           mapping="${{ fromJson(env.PATH_CONFIG_MAP) }}"
+
           filters=""
           # loop through the paths and generate a list of filters. convert the env to json
           for path in $(echo $mapping | jq -r '.[] | .path'); do
