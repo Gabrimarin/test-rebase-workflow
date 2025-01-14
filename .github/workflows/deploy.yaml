@@ -31,6 +31,7 @@ jobs:
       pull-requests: "read"
 
     strategy:
+      fail-fast: false
       matrix:
         component:
           - { path: "typesense-client", config: "firebase-typesense.json" }
