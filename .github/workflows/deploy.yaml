@@ -69,10 +69,9 @@ jobs:
         run: |
           echo "Processing mapping from env variable..."
           # get a list of paths from the env in the format (path1:path1/** /n path2:path2/** /n ...)
-          mapping=${{ fromJson(env.PATH_CONFIG_MAP) }}
           filters=""
           # loop through the paths and generate a list of filters. convert the env to json
-          for path in $(echo $mapping | jq -r '.[] | .path'); do
+          for path in $(echo ${{ fromJson(env.PATH_CONFIG_MAP) }} | jq -r '.[] | .path'); do
             filters="$filters$path/** "
           done
           echo "filters=$filters" >> $GITHUB_OUTPUT
