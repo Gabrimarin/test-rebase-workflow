@@ -67,19 +67,14 @@ jobs:
         id: process-mapping
         run: |
           echo "Processing mapping from env variable..."
-          mapping=${{ env.PATH_CONFIG_MAP }}
-          # print content of mapping
-          echo "PRINTING MAPPING"
-          echo $mapping
-
-
-          # Prepare filters dynamically ("$path:$path/**" for each path)
-          echo "$mapping" | jq -r '.[] | "\(.path):\(.path)/**"' > filters.txt
-          filters=$(cat filters.txt)
-
-          echo $filters
-
-          echo "filters=$filters" >> $GITHUB_ENV
+          # get a list of paths from the env in the format (path1:path1/** /n path2:path2/** /n ...)
+          mapping="${{ env.PATH_CONFIG_MAP }}"
+          filters=""
+          # loop through the paths and generate a list of filters. convert the env to json
+          for path in $(echo $mapping | jq -r '.[] | .path'); do
+            filters="$filters$path/** "
+          done
+          echo "filters=$filters" >> $GITHUB_OUTPUT
 
       - name: Paths Filter
         id: filter
