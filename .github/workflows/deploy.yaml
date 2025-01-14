@@ -20,7 +20,7 @@ env:
   GOOGLE_APPLICATION_CREDENTIALS: "${{ secrets.PRE_PRODUCTION_SERVICE_ACCOUNT }}"
 
   PATH_CONFIG_MAP: |
-    '[
+    [
           { "path": "typesense-client", "config": "firebase-typesense.json" },
           { "path": "kiosk", "config": "firebase-kiosk.json" },
           { "path": "tickets", "config": "firebase-tickets.json" },
@@ -50,7 +50,7 @@ env:
           { "path": "hexnode", "config": "firebase-hexnode.json" },
           { "path": "reports", "config": "firebase-reports.json" },
           { "path": "query", "config": "firebase-query.json" }
-    ]'
+    ]
 
 jobs:
   changes:
