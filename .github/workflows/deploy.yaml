@@ -73,19 +73,19 @@ jobs:
         with:
           node-version: "18"
 
-      - id: "auth"
-        name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v2"
-        with:
-          credentials_json: "${{ env.GOOGLE_SERVICE_ACCOUNT }}"
+      # - id: "auth"
+      #   name: "Authenticate to Google Cloud"
+      #   uses: "google-github-actions/auth@v2"
+      #   with:
+      #     credentials_json: "${{ env.GOOGLE_SERVICE_ACCOUNT }}"
 
-      - name: "Set up Cloud SDK"
-        uses: "google-github-actions/setup-gcloud@v2"
+      # - name: "Set up Cloud SDK"
+      #   uses: "google-github-actions/setup-gcloud@v2"
 
-      - name: "Set Firebase Project"
-        run: |
-          sudo npm install -g firebase-tools
-          firebase use ${{ env.GCP_PROJECT_ID }}
+      # - name: "Set Firebase Project"
+      #   run: |
+      #     sudo npm install -g firebase-tools
+      #     firebase use ${{ env.GCP_PROJECT_ID }}
 
       - name: "Path Filter Check"
         id: filter
@@ -99,14 +99,10 @@ jobs:
         name: Build and Deploy ${{ matrix.component.path }}
         run: |
           echo "Changes detected in /${{ matrix.component.path }}"
-          cd ${{ matrix.component.path }}
-          npm install
-          npm run build
-          echo "n\n" | firebase deploy --config=${{ matrix.component.config }} --project=${{ env.GCP_PROJECT_ID }} --interactive
         continue-on-error: true
 
       - if: steps.filter.outputs.${{ matrix.component.path }} == 'true'
         name: Deploy ${{ matrix.component.path }} after failed tsc
         run: |
           cd ${{ matrix.component.path }}
-          echo "n\n" | firebase deploy --config=${{ matrix.component.config }} --project=${{ env.GCP_PROJECT_ID }} --interactive
+          echo "Deploying ${{ matrix.component.path }} to Pre-Prod"
