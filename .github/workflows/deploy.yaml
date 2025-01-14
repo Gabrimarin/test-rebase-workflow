@@ -68,6 +68,7 @@ jobs:
         run: |
           echo "Processing mapping from env variable..."
           mapping="${PATH_CONFIG_MAPPING}"
+          echo "$mapping"
 
           # Prepare filters dynamically
           filters=""
