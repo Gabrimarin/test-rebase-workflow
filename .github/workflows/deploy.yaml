@@ -78,7 +78,7 @@ jobs:
           for path in $(echo $mapping | jq -r '.[] | .path'); do
             filters="$filters\n$path: $path/**"
           done
-          echo "filters=$(echo $filters)" >> $GITHUB_OUTPUT
+          echo "filters=$filters" >> $GITHUB_ENV
 
       - name: Paths Filter
         id: filter
